@@ -1,14 +1,34 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+
+# Googlebot
 User-agent: Googlebot
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
 
+# Bingbot
 User-agent: Bingbot
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
 
+# Twitterbot
 User-agent: Twitterbot
 Allow: /
 
+# facebookexternalhit
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Host
+Host: https://www.gausselectromagnetics.com
+
+# Sitemaps
+Sitemap: https://www.gausselectromagnetics.com/sitemap.xml

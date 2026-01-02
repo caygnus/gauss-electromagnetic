@@ -31,5 +31,16 @@ jobs:
                   export NODE_OPTIONS="--max-old-space-size=4096"
                   vercel build --prod --token=${{secrets.VERCEL_TOKEN}}
 
+            - name: Generate Sitemap and Robots.txt
+              run: |
+                  export NODE_OPTIONS="--max-old-space-size=4096"
+                  npm run postbuild
+
+            - name: Verify SEO Files
+              run: |
+                  test -f public/sitemap.xml || test -f public/sitemap-0.xml || (echo "Error: Sitemap not generated" && exit 1)
+                  test -f public/robots.txt || (echo "Error: robots.txt not generated" && exit 1)
+                  echo "✓ SEO files generated successfully"
+
             - name: Deploy Project Artifacts
               run: vercel deploy --prebuilt --prod --token=${{secrets.VERCEL_TOKEN}}
