@@ -16,6 +16,7 @@ declare namespace NodeJS {
   // Server-side environment variables (server-only)
   RESEND_API_KEY?: string
   RESEND_FROM_ADDRESS?: string
+  ADMIN_EMAIL?: string
 
   // Add more server-only variables here
   // Example:

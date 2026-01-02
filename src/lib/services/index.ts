@@ -12,3 +12,12 @@ export {
  type ServerEnv,
  type EnvConfig,
 } from "./env.service"
+
+// Email services
+export {
+ sendContactEnquiry,
+ resendClient,
+ ResendClient,
+ renderTemplate,
+ type EmailResult,
+} from "./email"

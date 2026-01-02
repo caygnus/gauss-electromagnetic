@@ -2,8 +2,17 @@
  * Environment Service
  *
  * Singleton class for type-safe access to environment variables.
- * Distinguishes between client-side (NEXT_PUBLIC_*) and server-side variables.
+ * Loads defaults from config.yaml and overrides with .env file values.
+ *
+ * Configuration Precedence:
+ * 1. config.yaml - Default values (loaded first)
+ * 2. .env file / process.env - Overrides config.yaml values (takes precedence)
  */
+
+import { readFileSync } from "fs"
+import { join } from "path"
+import yaml from "js-yaml"
+import type { AppConfig, ClientConfig, ServerConfig } from "@/types"
 
 /**
  * Enum for environment variable keys
@@ -13,6 +22,7 @@ export enum EnvKey {
  // Server-side environment variables
  RESEND_API_KEY = "RESEND_API_KEY",
  RESEND_FROM_ADDRESS = "RESEND_FROM_ADDRESS",
+ ADMIN_EMAIL = "ADMIN_EMAIL",
 
  // Client-side environment variables (NEXT_PUBLIC_*)
  // Add your NEXT_PUBLIC_* keys here
@@ -22,18 +32,10 @@ export enum EnvKey {
 
 // Type definitions for environment variables
 export interface ClientEnv {
- // Add your NEXT_PUBLIC_* environment variables here
- // Example:
- // NEXT_PUBLIC_API_URL?: string;
- // NEXT_PUBLIC_APP_NAME?: string;
  [key: `NEXT_PUBLIC_${string}`]: string | undefined
 }
 
 export interface ServerEnv {
- // Add your server-only environment variables here
- // Example:
- // DATABASE_URL?: string;
- // API_SECRET_KEY?: string;
  [key: string]: string | undefined
 }
 
@@ -43,30 +45,88 @@ export interface EnvConfig {
 }
 
 /**
+ * Load config.yaml file
+ */
+function loadConfigFromFile(): { client: ClientConfig; server: ServerConfig } {
+ try {
+  const configPath = join(process.cwd(), "config.yaml")
+  const fileContents = readFileSync(configPath, "utf-8")
+  const parsed = yaml.load(fileContents) as AppConfig
+
+  if (!parsed?.env) {
+   console.warn("config.yaml is missing 'env' section, using empty config")
+   return { client: {}, server: {} }
+  }
+
+  return {
+   client: parsed.env.client || {},
+   server: parsed.env.server || {},
+  }
+ } catch (error) {
+  if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+   console.info("config.yaml not found, using environment variables only")
+  } else {
+   console.error("Error loading config.yaml:", error)
+  }
+  return { client: {}, server: {} }
+ }
+}
+
+/**
+ * Merge config defaults with environment variables
+ * Environment variables take precedence
+ */
+function mergeEnvWithConfig(
+ configDefaults: ClientConfig | ServerConfig,
+ envPrefix?: string
+): Record<string, string | undefined> {
+ const result: Record<string, string | undefined> = {}
+ const defaults = configDefaults as Record<string, string>
+
+ // Step 1: Load defaults from config.yaml
+ Object.keys(defaults).forEach((key) => {
+  if (!envPrefix || key.startsWith(envPrefix)) {
+   result[key] = defaults[key]
+  }
+ })
+
+ // Step 2: Override with values from process.env (.env file takes precedence)
+ if (typeof process !== "undefined" && process.env) {
+  Object.keys(process.env).forEach((key) => {
+   const shouldInclude = envPrefix
+    ? key.startsWith(envPrefix)
+    : !key.startsWith("NEXT_PUBLIC_")
+   if (shouldInclude) {
+    const envValue = process.env[key]
+    if (envValue !== undefined) {
+     result[key] = envValue
+    }
+   }
+  })
+ }
+
+ return result
+}
+
+/**
  * Environment Service Class
  *
  * Singleton pattern for accessing environment variables with type safety.
- * Use getInstance() to get the singleton instance.
  */
 export class EnvService {
  private static instance: EnvService
  private clientEnv: ClientEnv
  private serverEnv: ServerEnv
 
- /**
-  * Private constructor to enforce singleton pattern
-  */
  private constructor() {
-  // Initialize client environment variables (NEXT_PUBLIC_*)
-  this.clientEnv = this.loadClientEnv()
-
-  // Initialize server environment variables
-  this.serverEnv = this.loadServerEnv()
+  const config = loadConfigFromFile()
+  this.clientEnv = mergeEnvWithConfig(
+   config.client,
+   "NEXT_PUBLIC_"
+  ) as ClientEnv
+  this.serverEnv = mergeEnvWithConfig(config.server) as ServerEnv
  }
 
- /**
-  * Get the singleton instance of EnvService
-  */
  public static getInstance(): EnvService {
   if (!EnvService.instance) {
    EnvService.instance = new EnvService()
@@ -74,138 +134,62 @@ export class EnvService {
   return EnvService.instance
  }
 
- /**
-  * Load all client-side environment variables (NEXT_PUBLIC_*)
-  */
- private loadClientEnv(): ClientEnv {
-  const clientEnv: ClientEnv = {} as ClientEnv
-
-  if (typeof window !== "undefined" || typeof process !== "undefined") {
-   // In Next.js, NEXT_PUBLIC_* variables are available on both client and server
-   Object.keys(process.env).forEach((key) => {
-    if (key.startsWith("NEXT_PUBLIC_")) {
-     clientEnv[key as keyof ClientEnv] = process.env[key]
-    }
-   })
-  }
-
-  return clientEnv
+ private getEnvValue(key: string, isClient: boolean): string | undefined {
+  return isClient ? this.clientEnv[key as keyof ClientEnv] : this.serverEnv[key]
  }
 
- /**
-  * Load all server-side environment variables
-  */
- private loadServerEnv(): ServerEnv {
-  const serverEnv: ServerEnv = {}
-
-  if (typeof process !== "undefined" && process.env) {
-   Object.keys(process.env).forEach((key) => {
-    // Exclude NEXT_PUBLIC_* variables from server env (they're in client env)
-    if (!key.startsWith("NEXT_PUBLIC_")) {
-     serverEnv[key] = process.env[key]
-    }
-   })
-  }
-
-  return serverEnv
- }
-
- /**
-  * Get a client-side environment variable
-  * @param key - The environment variable key from EnvKey enum (must start with NEXT_PUBLIC_)
-  * @returns The environment variable value or undefined
-  */
  public getClientEnv(key: EnvKey): string | undefined {
   const envKey = key as string
   if (!envKey.startsWith("NEXT_PUBLIC_")) {
    throw new Error(`Client env key must start with NEXT_PUBLIC_: ${envKey}`)
   }
-  return this.clientEnv[envKey as keyof ClientEnv]
+  return this.getEnvValue(envKey, true)
  }
 
- /**
-  * Get a server-side environment variable
-  * @param key - The environment variable key from EnvKey enum
-  * @returns The environment variable value or undefined
-  */
  public getServerEnv(key: EnvKey): string | undefined {
   const envKey = key as string
   if (envKey.startsWith("NEXT_PUBLIC_")) {
    throw new Error(`Server env key cannot start with NEXT_PUBLIC_: ${envKey}`)
   }
-  return this.serverEnv[envKey]
+  return this.getEnvValue(envKey, false)
  }
 
- /**
-  * Get an environment variable (automatically determines client or server)
-  * @param key - The environment variable key from EnvKey enum
-  * @returns The environment variable value or undefined
-  */
  public get(key: EnvKey): string | undefined {
   const envKey = key as string
-  if (envKey.startsWith("NEXT_PUBLIC_")) {
-   return this.getClientEnv(key)
-  }
-  return this.getServerEnv(key)
+  return envKey.startsWith("NEXT_PUBLIC_")
+   ? this.getClientEnv(key)
+   : this.getServerEnv(key)
  }
 
- /**
-  * Get all client-side environment variables
-  * @returns Object containing all client-side env variables
-  */
  public getAllClientEnv(): ClientEnv {
   return { ...this.clientEnv }
  }
 
- /**
-  * Get all server-side environment variables
-  * @returns Object containing all server-side env variables
-  */
  public getAllServerEnv(): ServerEnv {
   return { ...this.serverEnv }
  }
 
- /**
-  * Check if running on client side
-  * @returns true if running in browser, false otherwise
-  */
  public isClient(): boolean {
   return typeof window !== "undefined"
  }
 
- /**
-  * Check if running on server side
-  * @returns true if running on server, false otherwise
-  */
  public isServer(): boolean {
   return typeof window === "undefined"
  }
 
- // Direct getters for environment variables
- // Add getters here for each environment variable in EnvKey enum
-
- /**
-  * Get RESEND_API_KEY environment variable
-  * @returns The Resend API key or undefined
-  */
+ // Direct getters for convenience
  public getResendApiKey(): string | undefined {
-  return this.serverEnv[EnvKey.RESEND_API_KEY]
+  return this.getServerEnv(EnvKey.RESEND_API_KEY)
  }
 
- /**
-  * Get RESEND_FROM_ADDRESS environment variable
-  * @returns The Resend from address or undefined
-  */
  public getResendFromAddress(): string | undefined {
-  return this.serverEnv[EnvKey.RESEND_FROM_ADDRESS]
+  return this.getServerEnv(EnvKey.RESEND_FROM_ADDRESS)
  }
 
- // Add more direct getters here as you add more environment variables
- // Example:
- // public getDatabaseUrl(): string | undefined {
- //     return this.serverEnv[EnvKey.DATABASE_URL];
- // }
+ public getAdminEmail(): string | undefined {
+  return this.getServerEnv(EnvKey.ADMIN_EMAIL)
+ }
 }
 
-// Export singleton instance for convenience
+// Export singleton instance
 export const env = EnvService.getInstance()

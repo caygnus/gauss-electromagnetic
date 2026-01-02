@@ -1,0 +1,12 @@
+New Contact Enquiry
+
+Name: {{name}}
+Email: {{email}}
+Phone: {{phone}}
+{{#company}}Company: {{company}}
+{{/company}}Product Interest: {{productInterestLabel}}
+{{#message}}
+
+Message:
+{{message}}{{/message}}
+

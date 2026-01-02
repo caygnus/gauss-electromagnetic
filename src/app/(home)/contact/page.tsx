@@ -2,14 +2,17 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { ArrowRight, Phone, Mail } from "lucide-react"
+import { ArrowRight, Phone, Mail, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Header } from "@/components/layouts"
 import { Footer } from "@/components/layouts"
 import { ASSETS } from "@/lib/constants"
+import { submitContactForm } from "./actions"
+import { toast } from "react-hot-toast"
+import type { ContactFormData } from "@/types"
 
 const ContactPage = () => {
- const [formData, setFormData] = useState({
+ const [formData, setFormData] = useState<ContactFormData>({
   name: "",
   email: "",
   phone: "",
@@ -17,11 +20,38 @@ const ContactPage = () => {
   productInterest: "reactors",
   message: "",
  })
+ const [isSubmitting, setIsSubmitting] = useState(false)
 
- const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
-  // Handle form submission here
-  console.log("Form submitted:", formData)
+
+  setIsSubmitting(true)
+
+  try {
+   const result = await submitContactForm(formData)
+
+   if (result.success) {
+    toast.success(
+     result.message || "Thank you for your enquiry! We'll get back to you soon."
+    )
+    // Reset form after successful submission
+    setFormData({
+     name: "",
+     email: "",
+     phone: "",
+     company: "",
+     productInterest: "reactors",
+     message: "",
+    })
+   } else {
+    toast.error(result.error || "Failed to submit enquiry. Please try again.")
+   }
+  } catch (error) {
+   console.error("Error submitting form:", error)
+   toast.error("An unexpected error occurred. Please try again later.")
+  } finally {
+   setIsSubmitting(false)
+  }
  }
 
  const handleChange = (
@@ -119,7 +149,8 @@ const ContactPage = () => {
            value={formData.name}
            onChange={handleChange}
            required
-           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground"
+           disabled={isSubmitting}
+           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
            placeholder="John Doe"
           />
          </div>
@@ -139,7 +170,8 @@ const ContactPage = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground"
+            disabled={isSubmitting}
+            className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="john@company.com"
            />
           </div>
@@ -157,7 +189,8 @@ const ContactPage = () => {
             value={formData.phone}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground"
+            disabled={isSubmitting}
+            className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="+91 XXXXX XXXXX"
            />
           </div>
@@ -176,7 +209,8 @@ const ContactPage = () => {
            name="company"
            value={formData.company}
            onChange={handleChange}
-           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground"
+           disabled={isSubmitting}
+           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
            placeholder="Your company name"
           />
          </div>
@@ -193,7 +227,8 @@ const ContactPage = () => {
            name="productInterest"
            value={formData.productInterest}
            onChange={handleChange}
-           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground"
+           disabled={isSubmitting}
+           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           >
            <option value="reactors">Reactors</option>
            <option value="transformers">Transformers</option>
@@ -216,7 +251,8 @@ const ContactPage = () => {
            rows={4}
            value={formData.message}
            onChange={handleChange}
-           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary resize-none text-foreground"
+           disabled={isSubmitting}
+           className="w-full px-4 py-3 rounded bg-background border border-border focus:outline-none focus:border-secondary resize-none text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
            placeholder="Tell us about your requirements..."
           />
          </div>
@@ -226,9 +262,19 @@ const ContactPage = () => {
           size="lg"
           className="w-full"
           type="submit"
+          disabled={isSubmitting}
          >
-          Submit Enquiry
-          <ArrowRight size={18} />
+          {isSubmitting ? (
+           <>
+            <Loader2 size={18} className="animate-spin mr-2" />
+            Submitting...
+           </>
+          ) : (
+           <>
+            Submit Enquiry
+            <ArrowRight size={18} />
+           </>
+          )}
          </Button>
         </form>
        </div>
