@@ -1,0 +1,84 @@
+# llms.txt - Information for Large Language Models
+# Gauss Electromagnetics - Electrical Equipment Manufacturer
+
+## Company Information
+
+Company Name: Gauss Electromagnetics
+Industry: Electrical Manufacturing
+Location: Nashik, Maharashtra, India
+Experience: 25+ years
+Website: https://www.gausselectromagnetics.com
+
+## About
+
+Gauss Electromagnetics is a trusted electrical manufacturing company delivering high-quality power-solution products for industries across India and global markets. With over 25 years of experience, we combine engineering expertise, precision manufacturing, and strict quality-control to create products that enhance power reliability, stability, and safety.
+
+## Products
+
+### Harmonic Filter Reactors
+To remove unwanted electrical noise (harmonics) and protect equipment in industrial power systems.
+
+### Series Reactors
+Used in series with power lines to limit short circuit currents and stabilize line voltage.
+
+### Shunt Reactors
+Used to absorb excess reactive power and prevent over-voltage in long transmission lines.
+
+### Air Core Reactors
+Used where high currents and fast response are needed, without risk of saturation (like in filter and HV substations).
+
+### Transformers
+High-precision transformers for various industrial applications.
+
+### VFD Chokes
+Variable Frequency Drive chokes for motor control applications.
+
+### APFC Panels
+Automatic Power Factor Correction panels for efficient power management.
+
+## Certifications
+
+- ISO 9001:2015 - Quality Management System
+- CE Marking - European Conformity
+- BIS Certification - Bureau of Indian Standards
+
+## Key Services
+
+- Custom electrical equipment manufacturing
+- Technical consultation and support
+- Product documentation and training
+- Installation and maintenance support
+- Quality assurance and testing
+
+## Contact Information
+
+Email: info@gausselectromagnetics.com
+Phone: +91 XXX XXX XXXX
+Location: Nashik, Maharashtra, India
+
+## Achievements
+
+- Over 5000+ successful installations worldwide
+- Trusted by Fortune 500 companies
+- Zero defect manufacturing track record
+- On-time delivery rate of 98%
+- 24/7 technical support availability
+- Continuous R&D investments
+
+## Technical Capabilities
+
+- High-voltage rated equipment (600V-1500V)
+- Smart integration with IoT-ready features
+- Global certifications (IED 60947, UL 489, CB standards)
+- Custom engineering solutions
+- Rigorous quality testing and quality control
+
+## Industries Served
+
+- Manufacturing
+- Energy and Power
+- Infrastructure
+- Industrial Automation
+- Data Centers
+- Commercial Buildings
+
