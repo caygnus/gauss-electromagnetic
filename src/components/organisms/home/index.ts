@@ -1,0 +1,6 @@
+export { CTASection } from "./CTASection"
+export { HeroSection } from "./HeroSection"
+export { CompanyIntroSection } from "./CompanyIntroSection"
+export { WhyChooseUsSection } from "./WhyChooseUsSection"
+export { AboutSection } from "./AboutSection"
+export { CertificationsSection } from "./CertificationsSection"

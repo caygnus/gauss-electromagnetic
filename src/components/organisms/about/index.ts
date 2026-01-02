@@ -1,0 +1,5 @@
+export { AboutHeroSection } from "./AboutHeroSection"
+export { WhoWeAreSection } from "./WhoWeAreSection"
+export { CompanyTimelineSection } from "./CompanyTimelineSection"
+export { DirectorQuoteSection } from "./DirectorQuoteSection"
+export { VisionMissionValuesSection } from "./VisionMissionValuesSection"
