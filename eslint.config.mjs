@@ -20,7 +20,10 @@ const eslintConfig = defineConfig([
             // Disable setState in effect warning - allow it when needed
             "react-hooks/set-state-in-effect": "off",
             // Make other rules less strict or off
-            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+            ],
             "@typescript-eslint/no-explicit-any": "warn",
             "react/no-unescaped-entities": "off", // Turn off unescaped entities warning
         },
