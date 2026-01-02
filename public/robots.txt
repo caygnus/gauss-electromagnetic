@@ -1,30 +1,34 @@
-# robots.txt for Gauss Electromagnetics
-# https://www.gausselectromagnetics.com/robots.txt
-
-# Allow all search engines
+# *
 User-agent: *
 Allow: /
-
-# Disallow admin and API routes
 Disallow: /api/
 Disallow: /admin/
 Disallow: /_next/
 
-# Allow specific bots
+# Googlebot
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 0
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
 
+# Bingbot
 User-agent: Bingbot
 Allow: /
-Crawl-delay: 0
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
 
+# Twitterbot
 User-agent: Twitterbot
 Allow: /
 
+# facebookexternalhit
 User-agent: facebookexternalhit
 Allow: /
 
-# Sitemap location
-# Note: next-sitemap will automatically add this during build
-# Sitemap: https://www.gausselectromagnetics.com/sitemap.xml
+# Host
+Host: https://www.gausselectromagnetics.com
+
+# Sitemaps
+Sitemap: https://www.gausselectromagnetics.com/sitemap.xml

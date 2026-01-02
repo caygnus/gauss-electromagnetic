@@ -13,6 +13,24 @@ module.exports = {
                 allow: "/",
                 disallow: ["/api/", "/admin/", "/_next/"],
             },
+            {
+                userAgent: "Googlebot",
+                allow: "/",
+                disallow: ["/api/", "/admin/", "/_next/"],
+            },
+            {
+                userAgent: "Bingbot",
+                allow: "/",
+                disallow: ["/api/", "/admin/", "/_next/"],
+            },
+            {
+                userAgent: "Twitterbot",
+                allow: "/",
+            },
+            {
+                userAgent: "facebookexternalhit",
+                allow: "/",
+            },
         ],
         additionalSitemaps: [],
     },
