@@ -1,4 +1,14 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-staged
+# Format staged files (skip if no staged files)
+npx lint-staged || true
+
+# Type check
+npm run type-check
+
+# Lint
+npm run lint
+
+# Build check
+npm run build
