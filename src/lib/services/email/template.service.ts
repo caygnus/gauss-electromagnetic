@@ -13,7 +13,7 @@ import { join } from "path"
  * Get the templates directory path
  */
 function getTemplatesDir(): string {
- return join(process.cwd(), "src", "lib", "services", "email", "templates")
+    return join(process.cwd(), "src", "lib", "services", "email", "templates")
 }
 
 /**
@@ -23,18 +23,24 @@ function getTemplatesDir(): string {
  * @returns Template content as string
  */
 function loadTemplate(
- templateName: string,
- extension: string = "html"
+    templateName: string,
+    extension: string = "html"
 ): string {
- try {
-  const templatePath = join(getTemplatesDir(), `${templateName}.${extension}`)
-  return readFileSync(templatePath, "utf-8")
- } catch (error) {
-  console.error(`Failed to load template ${templateName}.${extension}:`, error)
-  throw new Error(
-   `Template ${templateName}.${extension} not found or could not be loaded`
-  )
- }
+    try {
+        const templatePath = join(
+            getTemplatesDir(),
+            `${templateName}.${extension}`
+        )
+        return readFileSync(templatePath, "utf-8")
+    } catch (error) {
+        console.error(
+            `Failed to load template ${templateName}.${extension}:`,
+            error
+        )
+        throw new Error(
+            `Template ${templateName}.${extension} not found or could not be loaded`
+        )
+    }
 }
 
 /**
@@ -45,17 +51,17 @@ function loadTemplate(
  * @returns Rendered template string
  */
 export function renderTemplate(
- templateName: string,
- data: Record<string, any>,
- extension: string = "html"
+    templateName: string,
+    data: Record<string, any>,
+    extension: string = "html"
 ): string {
- const template = loadTemplate(templateName, extension)
+    const template = loadTemplate(templateName, extension)
 
- try {
-  // Mustache.render(template, view, partials?)
-  return Mustache.render(template, data)
- } catch (error) {
-  console.error(`Failed to render template ${templateName}:`, error)
-  throw new Error(`Failed to render template ${templateName}`)
- }
+    try {
+        // Mustache.render(template, view, partials?)
+        return Mustache.render(template, data)
+    } catch (error) {
+        console.error(`Failed to render template ${templateName}:`, error)
+        throw new Error(`Failed to render template ${templateName}`)
+    }
 }

@@ -9,24 +9,24 @@
 # 2. .env file / process.env (overrides, takes precedence)
 
 env:
- # Client-side environment variables (NEXT_PUBLIC_*)
- # These are accessible on both client and server
- client:
-  # NEXT_PUBLIC_API_URL: "https://api.example.com"
-  # NEXT_PUBLIC_APP_NAME: "Gauss Electromagnetics"
-  # Add your NEXT_PUBLIC_* variables here
+    # Client-side environment variables (NEXT_PUBLIC_*)
+    # These are accessible on both client and server
+    client:
+        # NEXT_PUBLIC_API_URL: "https://api.example.com"
+        # NEXT_PUBLIC_APP_NAME: "Gauss Electromagnetics"
+        # Add your NEXT_PUBLIC_* variables here
 
- # Server-side environment variables
- # These are only accessible on the server
- server:
-  # Resend Email Service Configuration
-  RESEND_API_KEY: "" # Your Resend API key
-  RESEND_FROM_ADDRESS: "onboarding@resend.dev" # Sender email address (must be verified in Resend)
+    # Server-side environment variables
+    # These are only accessible on the server
+    server:
+        # Resend Email Service Configuration
+        RESEND_API_KEY: "" # Your Resend API key
+        RESEND_FROM_ADDRESS: "onboarding@resend.dev" # Sender email address (must be verified in Resend)
 
-  # Admin Email Configuration
-  ADMIN_EMAIL: "" # Email address to receive contact form enquiries
+        # Admin Email Configuration
+        ADMIN_EMAIL: "" # Email address to receive contact form enquiries
 
 
-  # Add more server-side environment variables here
-  # DATABASE_URL: ""
-  # API_SECRET_KEY: ""
+        # Add more server-side environment variables here
+        # DATABASE_URL: ""
+        # API_SECRET_KEY: ""

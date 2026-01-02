@@ -12,7 +12,7 @@ export { renderTemplate } from "./template.service"
 
 // Contact email service
 export {
- sendContactEnquiry,
- type EmailResult,
- type EmailSuccess,
+    sendContactEnquiry,
+    type EmailResult,
+    type EmailSuccess,
 } from "./contact.service"

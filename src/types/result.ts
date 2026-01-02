@@ -19,8 +19,8 @@
  */
 
 export type Result<T, E = string> =
- | { data: T; error: null }
- | { data: null; error: E }
+    | { data: T; error: null }
+    | { data: null; error: E }
 
 /**
  * Helper function to create a success result
@@ -28,7 +28,7 @@ export type Result<T, E = string> =
  * @returns Result object with data and null error
  */
 export function success<T, E = string>(data: T): Result<T, E> {
- return { data, error: null }
+    return { data, error: null }
 }
 
 /**
@@ -37,7 +37,7 @@ export function success<T, E = string>(data: T): Result<T, E> {
  * @returns Result object with null data and error
  */
 export function failure<T, E = string>(error: E): Result<T, E> {
- return { data: null, error }
+    return { data: null, error }
 }
 
 /**
@@ -46,9 +46,9 @@ export function failure<T, E = string>(error: E): Result<T, E> {
  * @returns true if result is successful (data is not null)
  */
 export function isSuccess<T, E = string>(
- result: Result<T, E>
+    result: Result<T, E>
 ): result is { data: T; error: null } {
- return result.data !== null && result.error === null
+    return result.data !== null && result.error === null
 }
 
 /**
@@ -57,7 +57,7 @@ export function isSuccess<T, E = string>(
  * @returns true if result is an error (error is not null)
  */
 export function isError<T, E = string>(
- result: Result<T, E>
+    result: Result<T, E>
 ): result is { data: null; error: E } {
- return result.data === null && result.error !== null
+    return result.data === null && result.error !== null
 }

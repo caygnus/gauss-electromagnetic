@@ -19,57 +19,61 @@ import type { AppConfig, ClientConfig, ServerConfig } from "@/types"
  * Add your environment variable keys here for type-safe access
  */
 export enum EnvKey {
- // Server-side environment variables
- RESEND_API_KEY = "RESEND_API_KEY",
- RESEND_FROM_ADDRESS = "RESEND_FROM_ADDRESS",
- ADMIN_EMAIL = "ADMIN_EMAIL",
+    // Server-side environment variables
+    RESEND_API_KEY = "RESEND_API_KEY",
+    RESEND_FROM_ADDRESS = "RESEND_FROM_ADDRESS",
+    ADMIN_EMAIL = "ADMIN_EMAIL",
 
- // Client-side environment variables (NEXT_PUBLIC_*)
- // Add your NEXT_PUBLIC_* keys here
- // NEXT_PUBLIC_API_URL = 'NEXT_PUBLIC_API_URL',
- // NEXT_PUBLIC_APP_NAME = 'NEXT_PUBLIC_APP_NAME',
+    // Client-side environment variables (NEXT_PUBLIC_*)
+    // Add your NEXT_PUBLIC_* keys here
+    // NEXT_PUBLIC_API_URL = 'NEXT_PUBLIC_API_URL',
+    // NEXT_PUBLIC_APP_NAME = 'NEXT_PUBLIC_APP_NAME',
 }
 
 // Type definitions for environment variables
 export interface ClientEnv {
- [key: `NEXT_PUBLIC_${string}`]: string | undefined
+    [key: `NEXT_PUBLIC_${string}`]: string | undefined
 }
 
 export interface ServerEnv {
- [key: string]: string | undefined
+    [key: string]: string | undefined
 }
 
 export interface EnvConfig {
- client: ClientEnv
- server: ServerEnv
+    client: ClientEnv
+    server: ServerEnv
 }
 
 /**
  * Load config.yaml file
  */
 function loadConfigFromFile(): { client: ClientConfig; server: ServerConfig } {
- try {
-  const configPath = join(process.cwd(), "config.yaml")
-  const fileContents = readFileSync(configPath, "utf-8")
-  const parsed = yaml.load(fileContents) as AppConfig
+    try {
+        const configPath = join(process.cwd(), "config.yaml")
+        const fileContents = readFileSync(configPath, "utf-8")
+        const parsed = yaml.load(fileContents) as AppConfig
 
-  if (!parsed?.env) {
-   console.warn("config.yaml is missing 'env' section, using empty config")
-   return { client: {}, server: {} }
-  }
+        if (!parsed?.env) {
+            console.warn(
+                "config.yaml is missing 'env' section, using empty config"
+            )
+            return { client: {}, server: {} }
+        }
 
-  return {
-   client: parsed.env.client || {},
-   server: parsed.env.server || {},
-  }
- } catch (error) {
-  if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-   console.info("config.yaml not found, using environment variables only")
-  } else {
-   console.error("Error loading config.yaml:", error)
-  }
-  return { client: {}, server: {} }
- }
+        return {
+            client: parsed.env.client || {},
+            server: parsed.env.server || {},
+        }
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+            console.info(
+                "config.yaml not found, using environment variables only"
+            )
+        } else {
+            console.error("Error loading config.yaml:", error)
+        }
+        return { client: {}, server: {} }
+    }
 }
 
 /**
@@ -77,35 +81,35 @@ function loadConfigFromFile(): { client: ClientConfig; server: ServerConfig } {
  * Environment variables take precedence
  */
 function mergeEnvWithConfig(
- configDefaults: ClientConfig | ServerConfig,
- envPrefix?: string
+    configDefaults: ClientConfig | ServerConfig,
+    envPrefix?: string
 ): Record<string, string | undefined> {
- const result: Record<string, string | undefined> = {}
- const defaults = configDefaults as Record<string, string>
+    const result: Record<string, string | undefined> = {}
+    const defaults = configDefaults as Record<string, string>
 
- // Step 1: Load defaults from config.yaml
- Object.keys(defaults).forEach((key) => {
-  if (!envPrefix || key.startsWith(envPrefix)) {
-   result[key] = defaults[key]
-  }
- })
+    // Step 1: Load defaults from config.yaml
+    Object.keys(defaults).forEach((key) => {
+        if (!envPrefix || key.startsWith(envPrefix)) {
+            result[key] = defaults[key]
+        }
+    })
 
- // Step 2: Override with values from process.env (.env file takes precedence)
- if (typeof process !== "undefined" && process.env) {
-  Object.keys(process.env).forEach((key) => {
-   const shouldInclude = envPrefix
-    ? key.startsWith(envPrefix)
-    : !key.startsWith("NEXT_PUBLIC_")
-   if (shouldInclude) {
-    const envValue = process.env[key]
-    if (envValue !== undefined) {
-     result[key] = envValue
+    // Step 2: Override with values from process.env (.env file takes precedence)
+    if (typeof process !== "undefined" && process.env) {
+        Object.keys(process.env).forEach((key) => {
+            const shouldInclude = envPrefix
+                ? key.startsWith(envPrefix)
+                : !key.startsWith("NEXT_PUBLIC_")
+            if (shouldInclude) {
+                const envValue = process.env[key]
+                if (envValue !== undefined) {
+                    result[key] = envValue
+                }
+            }
+        })
     }
-   }
-  })
- }
 
- return result
+    return result
 }
 
 /**
@@ -114,81 +118,87 @@ function mergeEnvWithConfig(
  * Singleton pattern for accessing environment variables with type safety.
  */
 export class EnvService {
- private static instance: EnvService
- private clientEnv: ClientEnv
- private serverEnv: ServerEnv
+    private static instance: EnvService
+    private clientEnv: ClientEnv
+    private serverEnv: ServerEnv
 
- private constructor() {
-  const config = loadConfigFromFile()
-  this.clientEnv = mergeEnvWithConfig(
-   config.client,
-   "NEXT_PUBLIC_"
-  ) as ClientEnv
-  this.serverEnv = mergeEnvWithConfig(config.server) as ServerEnv
- }
+    private constructor() {
+        const config = loadConfigFromFile()
+        this.clientEnv = mergeEnvWithConfig(
+            config.client,
+            "NEXT_PUBLIC_"
+        ) as ClientEnv
+        this.serverEnv = mergeEnvWithConfig(config.server) as ServerEnv
+    }
 
- public static getInstance(): EnvService {
-  if (!EnvService.instance) {
-   EnvService.instance = new EnvService()
-  }
-  return EnvService.instance
- }
+    public static getInstance(): EnvService {
+        if (!EnvService.instance) {
+            EnvService.instance = new EnvService()
+        }
+        return EnvService.instance
+    }
 
- private getEnvValue(key: string, isClient: boolean): string | undefined {
-  return isClient ? this.clientEnv[key as keyof ClientEnv] : this.serverEnv[key]
- }
+    private getEnvValue(key: string, isClient: boolean): string | undefined {
+        return isClient
+            ? this.clientEnv[key as keyof ClientEnv]
+            : this.serverEnv[key]
+    }
 
- public getClientEnv(key: EnvKey): string | undefined {
-  const envKey = key as string
-  if (!envKey.startsWith("NEXT_PUBLIC_")) {
-   throw new Error(`Client env key must start with NEXT_PUBLIC_: ${envKey}`)
-  }
-  return this.getEnvValue(envKey, true)
- }
+    public getClientEnv(key: EnvKey): string | undefined {
+        const envKey = key as string
+        if (!envKey.startsWith("NEXT_PUBLIC_")) {
+            throw new Error(
+                `Client env key must start with NEXT_PUBLIC_: ${envKey}`
+            )
+        }
+        return this.getEnvValue(envKey, true)
+    }
 
- public getServerEnv(key: EnvKey): string | undefined {
-  const envKey = key as string
-  if (envKey.startsWith("NEXT_PUBLIC_")) {
-   throw new Error(`Server env key cannot start with NEXT_PUBLIC_: ${envKey}`)
-  }
-  return this.getEnvValue(envKey, false)
- }
+    public getServerEnv(key: EnvKey): string | undefined {
+        const envKey = key as string
+        if (envKey.startsWith("NEXT_PUBLIC_")) {
+            throw new Error(
+                `Server env key cannot start with NEXT_PUBLIC_: ${envKey}`
+            )
+        }
+        return this.getEnvValue(envKey, false)
+    }
 
- public get(key: EnvKey): string | undefined {
-  const envKey = key as string
-  return envKey.startsWith("NEXT_PUBLIC_")
-   ? this.getClientEnv(key)
-   : this.getServerEnv(key)
- }
+    public get(key: EnvKey): string | undefined {
+        const envKey = key as string
+        return envKey.startsWith("NEXT_PUBLIC_")
+            ? this.getClientEnv(key)
+            : this.getServerEnv(key)
+    }
 
- public getAllClientEnv(): ClientEnv {
-  return { ...this.clientEnv }
- }
+    public getAllClientEnv(): ClientEnv {
+        return { ...this.clientEnv }
+    }
 
- public getAllServerEnv(): ServerEnv {
-  return { ...this.serverEnv }
- }
+    public getAllServerEnv(): ServerEnv {
+        return { ...this.serverEnv }
+    }
 
- public isClient(): boolean {
-  return typeof window !== "undefined"
- }
+    public isClient(): boolean {
+        return typeof window !== "undefined"
+    }
 
- public isServer(): boolean {
-  return typeof window === "undefined"
- }
+    public isServer(): boolean {
+        return typeof window === "undefined"
+    }
 
- // Direct getters for convenience
- public getResendApiKey(): string | undefined {
-  return this.getServerEnv(EnvKey.RESEND_API_KEY)
- }
+    // Direct getters for convenience
+    public getResendApiKey(): string | undefined {
+        return this.getServerEnv(EnvKey.RESEND_API_KEY)
+    }
 
- public getResendFromAddress(): string | undefined {
-  return this.getServerEnv(EnvKey.RESEND_FROM_ADDRESS)
- }
+    public getResendFromAddress(): string | undefined {
+        return this.getServerEnv(EnvKey.RESEND_FROM_ADDRESS)
+    }
 
- public getAdminEmail(): string | undefined {
-  return this.getServerEnv(EnvKey.ADMIN_EMAIL)
- }
+    public getAdminEmail(): string | undefined {
+        return this.getServerEnv(EnvKey.ADMIN_EMAIL)
+    }
 }
 
 // Export singleton instance
