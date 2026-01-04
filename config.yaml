@@ -26,6 +26,17 @@ env:
         # Admin Email Configuration
         ADMIN_EMAIL: "" # Email address to receive contact form enquiries
 
+        # Database Configuration (PostgreSQL)
+        # For Docker: DB_HOST = "localhost" or container name (e.g., "postgres", "db")
+        # For Neon Cloud: DB_HOST = "ep-xxx.region.aws.neon.tech"
+        DB_USER: "postgres"
+        DB_PASSWORD: "postgres"
+        DB_HOST: "localhost"
+        DB_PORT: "5432"
+        DB_NAME: "gauss_db"
+        DB_SSLMODE: "disable" # Use "disable" for local Docker, "require" for Neon/production
+        DB_CHANNEL_BINDING: "disable" # Use "disable" for local Docker, "require" for Neon
+
 
         # Add more server-side environment variables here
         # DATABASE_URL: ""

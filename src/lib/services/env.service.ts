@@ -24,6 +24,15 @@ export enum EnvKey {
     RESEND_FROM_ADDRESS = "RESEND_FROM_ADDRESS",
     ADMIN_EMAIL = "ADMIN_EMAIL",
 
+    // Database Configuration (Neon PostgreSQL)
+    DB_USER = "DB_USER",
+    DB_PASSWORD = "DB_PASSWORD",
+    DB_HOST = "DB_HOST",
+    DB_PORT = "DB_PORT",
+    DB_NAME = "DB_NAME",
+    DB_SSLMODE = "DB_SSLMODE",
+    DB_CHANNEL_BINDING = "DB_CHANNEL_BINDING",
+
     // Client-side environment variables (NEXT_PUBLIC_*)
     // Add your NEXT_PUBLIC_* keys here
     // NEXT_PUBLIC_API_URL = 'NEXT_PUBLIC_API_URL',
@@ -198,6 +207,93 @@ export class EnvService {
 
     public getAdminEmail(): string | undefined {
         return this.getServerEnv(EnvKey.ADMIN_EMAIL)
+    }
+
+    // Database configuration getters
+    public getDbUser(): string | undefined {
+        return this.getServerEnv(EnvKey.DB_USER)
+    }
+
+    public getDbPassword(): string | undefined {
+        return this.getServerEnv(EnvKey.DB_PASSWORD)
+    }
+
+    public getDbHost(): string | undefined {
+        return this.getServerEnv(EnvKey.DB_HOST)
+    }
+
+    public getDbPort(): string | undefined {
+        return this.getServerEnv(EnvKey.DB_PORT)
+    }
+
+    public getDbName(): string | undefined {
+        return this.getServerEnv(EnvKey.DB_NAME)
+    }
+
+    public getDbSslMode(): string | undefined {
+        return this.getServerEnv(EnvKey.DB_SSLMODE)
+    }
+
+    public getDbChannelBinding(): string | undefined {
+        return this.getServerEnv(EnvKey.DB_CHANNEL_BINDING)
+    }
+
+    /**
+     * Get the full database connection URL (PostgreSQL URI format)
+     * Format: postgresql://user:password@host:port/database?sslmode=xxx
+     */
+    public getDatabaseUrl(): string | undefined {
+        const user = this.getDbUser()
+        const password = this.getDbPassword()
+        const host = this.getDbHost()
+        const port = this.getDbPort()
+        const name = this.getDbName()
+        const sslmode = this.getDbSslMode()
+
+        if (!user || !password || !host || !port || !name) {
+            return undefined
+        }
+
+        return `postgresql://${user}:${password}@${host}:${port}/${name}?sslmode=${sslmode || "disable"}`
+    }
+
+    /**
+     * Get database connection config object for Drizzle/pg Pool
+     * Useful when you need individual connection parameters
+     *
+     * @example
+     * import { Pool } from 'pg';
+     * const pool = new Pool(env.getDatabaseConfig());
+     */
+    public getDatabaseConfig():
+        | {
+              user: string
+              password: string
+              host: string
+              port: number
+              database: string
+              ssl: boolean | { rejectUnauthorized: boolean }
+          }
+        | undefined {
+        const user = this.getDbUser()
+        const password = this.getDbPassword()
+        const host = this.getDbHost()
+        const port = this.getDbPort()
+        const database = this.getDbName()
+        const sslmode = this.getDbSslMode()
+
+        if (!user || !password || !host || !port || !database) {
+            return undefined
+        }
+
+        return {
+            user,
+            password,
+            host,
+            port: parseInt(port, 10),
+            database,
+            ssl: sslmode === "require" ? { rejectUnauthorized: false } : false,
+        }
     }
 }
 
