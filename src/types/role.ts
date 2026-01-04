@@ -1,5 +1,5 @@
 // Role types for the application
-export enum Role {
+export enum UserRole {
     SYSTEM = "system",
     ADMIN = "admin",
     USER = "user",
@@ -25,16 +25,16 @@ export enum Permission {
 }
 
 // Authority levels (higher = more authority)
-export const RoleAuthority: Record<Role, number> = {
-    [Role.SYSTEM]: 100,
-    [Role.ADMIN]: 80,
-    [Role.USER]: 50,
-    [Role.CUSTOMER]: 10,
+export const RoleAuthority: Record<UserRole, number> = {
+    [UserRole.SYSTEM]: 100,
+    [UserRole.ADMIN]: 80,
+    [UserRole.USER]: 50,
+    [UserRole.CUSTOMER]: 10,
 }
 
 // Permissions per role
-export const RolePermissions: Record<Role, Permission[]> = {
-    [Role.SYSTEM]: [
+export const RolePermissions: Record<UserRole, Permission[]> = {
+    [UserRole.SYSTEM]: [
         Permission.USERS_READ,
         Permission.USERS_WRITE,
         Permission.USERS_DELETE,
@@ -47,7 +47,7 @@ export const RolePermissions: Record<Role, Permission[]> = {
         Permission.SETTINGS_WRITE,
     ],
 
-    [Role.ADMIN]: [
+    [UserRole.ADMIN]: [
         Permission.USERS_READ,
         Permission.USERS_WRITE,
         Permission.ORDERS_READ,
@@ -58,25 +58,34 @@ export const RolePermissions: Record<Role, Permission[]> = {
         Permission.SETTINGS_READ,
     ],
 
-    [Role.USER]: [
+    [UserRole.USER]: [
         Permission.ORDERS_READ,
         Permission.ORDERS_WRITE,
         Permission.INVENTORY_READ,
     ],
 
-    [Role.CUSTOMER]: [Permission.ORDERS_READ],
+    [UserRole.CUSTOMER]: [Permission.ORDERS_READ],
 }
 
 // Helper functions
-export const hasPermission = (role: Role, permission: Permission): boolean => {
+export const hasPermission = (
+    role: UserRole,
+    permission: Permission
+): boolean => {
     return RolePermissions[role].includes(permission)
 }
 
-export const hasAuthority = (role: Role, requiredRole: Role): boolean => {
+export const hasAuthority = (
+    role: UserRole,
+    requiredRole: UserRole
+): boolean => {
     return RoleAuthority[role] >= RoleAuthority[requiredRole]
 }
 
-export const canManageRole = (actorRole: Role, targetRole: Role): boolean => {
+export const canManageRole = (
+    actorRole: UserRole,
+    targetRole: UserRole
+): boolean => {
     // Can only manage roles with lower authority
     return RoleAuthority[actorRole] > RoleAuthority[targetRole]
 }

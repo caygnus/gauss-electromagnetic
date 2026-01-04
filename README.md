@@ -152,6 +152,20 @@ The project is configured for automatic deployment to Vercel via GitHub Actions.
 
 Set these in Vercel dashboard or `.env.local`:
 
+**Clerk Authentication (Required):**
+
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key (from [Clerk Dashboard](https://dashboard.clerk.com/last-active?path=api-keys))
+- `CLERK_SECRET_KEY` - Clerk secret key (from Clerk Dashboard)
+
+**Clerk Redirect URLs (Optional - configured via ClerkProvider):**
+
+These can be set via environment variables or ClerkProvider props. Currently configured in `src/app/layout.tsx`:
+
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL` - Sign-in page URL (default: `/sign-in`)
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL` - Sign-up page URL (default: `/sign-up`)
+- `NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL` - Force redirect after sign-in (default: `/auth/callback`)
+- `NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL` - Force redirect after sign-up (default: `/auth/callback`)
+
 **Client-side (NEXT*PUBLIC*\*):**
 
 - `NEXT_PUBLIC_SITE_URL` - Production site URL

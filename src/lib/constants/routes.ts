@@ -13,6 +13,9 @@ export const ROUTES = {
     PRIVACY: "/privacy",
     TERMS: "/terms",
     SUPPORT: "/support",
+    AUTH: {
+        CALLBACK: "/auth/callback",
+    },
 } as const
 
 /**

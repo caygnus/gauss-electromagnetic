@@ -4,6 +4,13 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X, Zap } from "lucide-react"
+import {
+    SignInButton,
+    SignUpButton,
+    SignedIn,
+    SignedOut,
+    UserButton,
+} from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ROUTES } from "@/lib/constants"
@@ -75,8 +82,29 @@ export const Header = () => {
                         ))}
                     </div>
 
-                    {/* CTA Button */}
+                    {/* CTA Button & Auth */}
                     <div className="hidden md:flex items-center gap-4">
+                        <SignedOut>
+                            <SignInButton
+                                mode="redirect"
+                                forceRedirectUrl={ROUTES.AUTH.CALLBACK}
+                            >
+                                <Button variant="outline" size="default">
+                                    Sign In
+                                </Button>
+                            </SignInButton>
+                            <SignUpButton
+                                mode="redirect"
+                                forceRedirectUrl={ROUTES.AUTH.CALLBACK}
+                            >
+                                <Button variant="industrial" size="default">
+                                    Sign Up
+                                </Button>
+                            </SignUpButton>
+                        </SignedOut>
+                        <SignedIn>
+                            <UserButton />
+                        </SignedIn>
                         <Button variant="industrial" size="default" asChild>
                             <Link href={ROUTES.CONTACT}>Enquire Now</Link>
                         </Button>
@@ -114,6 +142,37 @@ export const Header = () => {
                                     {item.label}
                                 </Link>
                             ))}
+                            <SignedOut>
+                                <SignInButton
+                                    mode="redirect"
+                                    forceRedirectUrl={ROUTES.AUTH.CALLBACK}
+                                >
+                                    <Button
+                                        variant="outline"
+                                        size="default"
+                                        className="w-full"
+                                    >
+                                        Sign In
+                                    </Button>
+                                </SignInButton>
+                                <SignUpButton
+                                    mode="redirect"
+                                    forceRedirectUrl={ROUTES.AUTH.CALLBACK}
+                                >
+                                    <Button
+                                        variant="industrial"
+                                        size="default"
+                                        className="w-full"
+                                    >
+                                        Sign Up
+                                    </Button>
+                                </SignUpButton>
+                            </SignedOut>
+                            <SignedIn>
+                                <div className="flex items-center justify-center py-2">
+                                    <UserButton />
+                                </div>
+                            </SignedIn>
                             <Button
                                 variant="industrial"
                                 size="default"
