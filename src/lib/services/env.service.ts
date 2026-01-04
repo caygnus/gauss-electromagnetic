@@ -239,7 +239,8 @@ export class EnvService {
     }
 
     /**
-     * Get the full database connection URL for Neon PostgreSQL
+     * Get the full database connection URL (PostgreSQL URI format)
+     * Format: postgresql://user:password@host:port/database?sslmode=xxx
      */
     public getDatabaseUrl(): string | undefined {
         const user = this.getDbUser()
@@ -253,7 +254,46 @@ export class EnvService {
             return undefined
         }
 
-        return `postgresql://${user}:${password}@${host}:${port}/${name}?sslmode=${sslmode || "require"}`
+        return `postgresql://${user}:${password}@${host}:${port}/${name}?sslmode=${sslmode || "disable"}`
+    }
+
+    /**
+     * Get database connection config object for Drizzle/pg Pool
+     * Useful when you need individual connection parameters
+     *
+     * @example
+     * import { Pool } from 'pg';
+     * const pool = new Pool(env.getDatabaseConfig());
+     */
+    public getDatabaseConfig():
+        | {
+              user: string
+              password: string
+              host: string
+              port: number
+              database: string
+              ssl: boolean | { rejectUnauthorized: boolean }
+          }
+        | undefined {
+        const user = this.getDbUser()
+        const password = this.getDbPassword()
+        const host = this.getDbHost()
+        const port = this.getDbPort()
+        const database = this.getDbName()
+        const sslmode = this.getDbSslMode()
+
+        if (!user || !password || !host || !port || !database) {
+            return undefined
+        }
+
+        return {
+            user,
+            password,
+            host,
+            port: parseInt(port, 10),
+            database,
+            ssl: sslmode === "require" ? { rejectUnauthorized: false } : false,
+        }
     }
 }
 
